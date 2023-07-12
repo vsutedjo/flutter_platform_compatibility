@@ -43,7 +43,7 @@ def flutter_compatibility_checker(input_filepath, output_filepath):
                         version = packages[package]
                     package_row += [version]
 
-                    # Scrape the url of the package for windows compatibility tag.
+                    # Scrape the url of the package for platform compatibility tag.
                     url = "https://pub.dev/packages/" + package
                     r = requests.get(url)
                     soup = BeautifulSoup(r.text, 'html.parser')
@@ -51,10 +51,12 @@ def flutter_compatibility_checker(input_filepath, output_filepath):
                     for platform in searched_platforms:
                         # The html expression we are searching for.
                         platform_tag = platform
+                        # Web has an exception where it uses the lowercase version for the tag.
                         if platform == "Web":
                             platform_tag= platform.lower()
                         filter_expr = '<a class="tag-badge-sub" href="/packages?q=platform%3A'+platform.lower()+'" rel="nofollow" ' \
                                       'title="Packages compatible with ' + platform + ' platform">'+ platform_tag +'</a>'
+                        # Check if the entry for this platform exists.
                         platform_compatible = len(list(filter(lambda entry: str(
                             entry.parent) == filter_expr, soup.body.findAll(text=platform_tag)))) > 0
                         package_row += [platform_compatible]
